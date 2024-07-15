@@ -34,8 +34,6 @@ public class SocialNetwork {
 
             //getMessagesBetweenUsers(connection, 1, 2);
 
-
-
             //addPost(connection, "Всем привет хочу пригласить вас в свой блог!", NOW, 1);
             //getUserActions(connection, 1);
             //addLike(connection, 1, 1);

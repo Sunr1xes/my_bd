@@ -22,9 +22,9 @@ public class SocialNetwork {
 
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, USER_NAME, DATABASE_PASS)) {
 
-            //addUser(connection, "Roman", "Jopnikov", java.sql.Date.valueOf("2005-05-04"), "6fkdlfj@gmail.com", "popadnuiw3");
+            //addUser(connection, "Иван", "Иванов", java.sql.Date.valueOf("2005-05-04"), "6fkdlfj@gmail.com", "cftrydnuiw3");
             //getUserActions(connection, 2);
-            //deleteUserCascade(connection, 5);
+            //deleteUserCascade(connection, 3);
             //addLike(connection, 2, 1);
             //addFriend(connection, 1, 3);
             //deleteFriend(connection, 1, 2);
@@ -60,8 +60,6 @@ public class SocialNetwork {
 
             System.out.println("Список всех комментариев: ");
             getComments(connection);
-
-            //updateUser(connection, 1, "Maksem", "Zimonin", java.sql.Date.valueOf("2005-11-25"), "zimonin.max@yandex.ru", "1925364870");
 
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23514"))

@@ -33,6 +33,7 @@ public class SocialNetwork {
             //deleteComment(connection, 2, 2);
 
             //getMessagesBetweenUsers(connection, 1, 2);
+            //addComments(connection, "ну не спасибо", NOW, 1, 1);
 
             //addPost(connection, "Всем привет хочу пригласить вас в свой блог!", NOW, 1);
             //getUserActions(connection, 1);
@@ -978,6 +979,36 @@ public class SocialNetwork {
             }
         } catch (SQLException e) {
             System.out.println("Ошибка при обновлении поста: " + e.getMessage());
+            throw e;
+        }
+        System.out.println();
+    }
+
+    private static void updateComment(Connection connection, String text, int author_id, int comment_id) throws SQLException {
+        if (userVerification(connection, author_id)) {
+            System.out.println("Пользователя с ID: " + author_id + " не найден");
+            return;
+        }
+        if (commentVerification(connection, comment_id)) {
+            System.out.println("Комментарий с ID: " + comment_id + " не найден");
+            return;
+        }
+
+        String query = "UPDATE comments SET text = ? WHERE id = ? AND author_id = ?";
+
+        try(PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, text);
+            statement.setInt(2, comment_id);
+            statement.setInt(3, author_id);
+
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Комментарий успешно обновлен");
+            } else {
+                System.out.println("Комментарий не удалось обновить");
+            }
+        } catch (SQLException e) {
+            System.out.println("Ошибка при обновлении комментария: " + e.getMessage());
             throw e;
         }
         System.out.println();

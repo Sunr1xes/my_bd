@@ -95,7 +95,6 @@ public class SocialNetwork {
             throw new RuntimeException(e);
         }
     }
-
     //Reset
     private static void resetUserIdSequenceIfTableEmpty(Connection connection) throws SQLException {
         String checkTableEmptySQL = "SELECT COUNT(*) FROM users";

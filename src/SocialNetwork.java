@@ -22,10 +22,32 @@ public class SocialNetwork {
 
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, USER_NAME, DATABASE_PASS)) {
 
-            //addUser(connection, "Иван", "Иванов", java.sql.Date.valueOf("2005-05-04"), "6fkdlfj@gmail.com", "cftrydnuiw3");
+            System.out.println("Переписка двух пользователей:");
+            getMessagesBetweenUsers(connection, 1, 5);
+            System.out.println("Все комментарии под постом:");
+            getCommentsByPosts(connection, 5);
+            System.out.println("Все посты конкретного пользователя:");
+            getPostsByUser(connection, 1);
+            System.out.println("Автор конкретного поста:");
+            getPostAuthor(connection, 3);
+            System.out.println("Количество лайков под конкретным постом:");
+            getLikesCount(connection, 5);
+            System.out.println("Количество друзей по убыванию:");
+            getUsersWithMostFriends(connection);
+            System.out.println("Количество лайков на посте по убыванию:");
+            getPostsWithMostLikes(connection);
+
+            //addUser(connection, "Дарья", "Зеленина", java.sql.Date.valueOf("1984-11-30"), "jshearer@att.net", "1KsEu6Oo22tf");
             //addUser(connection, "Петр", "Иванов", java.sql.Date.valueOf("2000-01-12"), "petrIvanov@yandex.ru", "123123");
             //addComments(connection, "мне нравится", 1, 3);
+            //addPost(connection, "Что?", 6);
+            //addLike(connection, 5, 7);
+            //addFriend(connection, 9, 6);
+            //addComments(connection, "где?", 5, 9);
+            //sendMessage(connection, "Привет, да нормуль", 5, 1);
+            //updatePost(connection, 1, 1, "Всем привет!");
 
+            //deleteAllPosts(connection, 1);
 //            addFriend(connection, 1, 3);
             //addPost(connection, "Всем привет хочу пригласить вас в свой блог!", NOW, 1);
 //            deleteAllPosts(connection, 1);
@@ -236,7 +258,8 @@ public class SocialNetwork {
             String param2 = rs.getString(columnName2);
             String param1 = rs.getString(columnName1);
             int param0 = rs.getInt(columnName0);
-            System.out.println("ID: " + param0 + " | Имя: " + param1 + " | Фамилия: " + param2 + " | Дата рождения: " + param3 + " | email: " + param4 + " | password: " + param5);
+            System.out.println("ID: " + param0 + " | Имя: " + param1 + " | Фамилия: " + param2
+                    + " | Дата рождения: " + param3 + " | email: " + param4 + " | password: " + param5);
         }
         System.out.println();
     }
@@ -351,7 +374,8 @@ public class SocialNetwork {
             preparedStatement.setInt(1, post_id);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + " | Имя: " + rs.getString("first_name") + " | Фамилия: " + rs.getString("last_name"));
+                System.out.println("ID: " + rs.getInt("id") + " | Имя: " + rs.getString("first_name")
+                        + " | Фамилия: " + rs.getString("last_name"));
             }
         } catch (SQLException e) {
             System.out.println("Ошибка при получения автора поста: " + e.getMessage());
@@ -411,7 +435,8 @@ public class SocialNetwork {
             System.out.println("Пользователь c этим ID не найден");
             return;
         }
-        String query = "SELECT id, text, sent_date, sender_id, receiver_id FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)";
+        String query = "SELECT id, text, sent_date, sender_id, receiver_id FROM messages WHERE (sender_id = ? AND receiver_id = ?)" +
+                " OR (sender_id = ? AND receiver_id = ?)";
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, user_id1);
             preparedStatement.setInt(2, user_id2);
@@ -425,7 +450,8 @@ public class SocialNetwork {
                 Date sentDate = rs.getDate("sent_date");
                 int sender_id = rs.getInt("sender_id");
                 int receiver_id = rs.getInt("receiver_id");
-                System.out.println("ID сообщения: " + message_id + " | текст: " + text + " | дата написания сообщения: " + sentDate + " | ID отправителя: " + sender_id + " | ID получателя: " + receiver_id);
+                System.out.println("ID сообщения: " + message_id + " | текст: " + text + " | дата написания сообщения: "
+                        + sentDate + " | ID отправителя: " + sender_id + " | ID получателя: " + receiver_id);
             }
         } catch (SQLException e) {
             System.out.println("Ошибка при получении сообщений между пользователями: " + e.getMessage());

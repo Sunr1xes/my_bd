@@ -22,26 +22,33 @@ public class SocialNetwork {
 
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, USER_NAME, DATABASE_PASS)) {
 
-            //addUser(connection, "Roman", "Jopnikov", java.sql.Date.valueOf("2005-05-04"), "6fkdlfj@gmail.com", "popadnuiw3");
-            //getUserActions(connection, 2);
-            //deleteUserCascade(connection, 5);
-            //addLike(connection, 2, 1);
-            //addFriend(connection, 1, 3);
-            //deleteFriend(connection, 1, 2);
+            //addUser(connection, "Иван", "Иванов", java.sql.Date.valueOf("2005-05-04"), "6fkdlfj@gmail.com", "cftrydnuiw3");
+            //addUser(connection, "Петр", "Иванов", java.sql.Date.valueOf("2000-01-12"), "petrIvanov@yandex.ru", "123123");
+            //addComments(connection, "мне нравится", 1, 3);
 
-            //deleteAllCommentsByUser(connection, 2);
-            //deleteComment(connection, 2, 2);
-
-            //getMessagesBetweenUsers(connection, 1, 2);
-
-
-
+//            addFriend(connection, 1, 3);
             //addPost(connection, "Всем привет хочу пригласить вас в свой блог!", NOW, 1);
-            //getUserActions(connection, 1);
-            //addLike(connection, 1, 1);
-            //addLike(connection, 1, 2);
-            //getLikesCount(connection, 1);
-            //deleteLike(connection, 1, 1);
+//            deleteAllPosts(connection, 1);
+//
+            //addComments(connection, "Я хочу!", 1, 3);
+//
+//            addLike(connection, 1, 1);
+//
+//            addFriend(connection, 1, 2);
+//
+//            sendMessage(connection, "Привет. Как дела?", NOW, 1, 3);
+//            sendMessage(connection, "Привет. Всё хорошо", NOW, 3, 1);
+//
+//            getMessagesBetweenUsers(connection, 1, 3);
+
+//            getPostsWithMostLikes(connection);
+//            getUsersWithMostFriends(connection);
+//            getCommentsByPosts(connection, 1);
+//
+//            getUserActions(connection, 1);
+
+            //deleteUserCascade(connection, 1);
+            //deleteUserCascade(connection, 2);
 
             System.out.println("Список всех пользователей: ");
             getUsers(connection);
@@ -60,8 +67,6 @@ public class SocialNetwork {
 
             System.out.println("Список всех комментариев: ");
             getComments(connection);
-
-            //updateUser(connection, 1, "Maksem", "Zimonin", java.sql.Date.valueOf("2005-11-25"), "zimonin.max@yandex.ru", "1925364870");
 
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23514"))
@@ -90,7 +95,6 @@ public class SocialNetwork {
             throw new RuntimeException(e);
         }
     }
-
     //Reset
     private static void resetUserIdSequenceIfTableEmpty(Connection connection) throws SQLException {
         String checkTableEmptySQL = "SELECT COUNT(*) FROM users";
@@ -383,14 +387,14 @@ public class SocialNetwork {
             System.out.println("Пост с ID: " + post_id + " не найден");
             return;
         }
-        String query = "SELECT id, text, create_date, author_id FROM comments WHERE post_id = ?";
+        String query = "SELECT id, text, creation_date, author_id FROM comments WHERE post_id = ?";
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, post_id);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 int comments_id = rs.getInt("id");
                 String text = rs.getString("text");
-                Date create_date = rs.getDate("create_date");
+                Date create_date = rs.getDate("creation_date");
                 int author_id = rs.getInt("author_id");
                 System.out.println("ID: " + comments_id + " | текст: " + text + " | дата написания: " + create_date + " | ID автора: " + author_id);
             }
@@ -539,7 +543,7 @@ public class SocialNetwork {
         System.out.println();
     }
 
-    private static void addPost(Connection connection, String text, java.sql.Date create_date, int author_id) throws SQLException {
+    private static void addPost(Connection connection, String text, int author_id) throws SQLException {
         resetPostIdSequenceIfTableEmpty(connection);
         if (userVerification(connection, author_id)) {
             System.out.println("Пользователь с id " + author_id + " не найден");
@@ -549,7 +553,7 @@ public class SocialNetwork {
         String insertSQL = "INSERT INTO posts (text, create_date, author_id) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             preparedStatement.setString(1, text);
-            preparedStatement.setDate(2, create_date);
+            preparedStatement.setDate(2, NOW);
             preparedStatement.setInt(3, author_id);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -563,7 +567,7 @@ public class SocialNetwork {
         System.out.println();
     }
 
-    private static void addComments(Connection connection, String text, java.sql.Date create_date, int post_id, int author_id) throws SQLException {
+    private static void addComments(Connection connection, String text, int post_id, int author_id) throws SQLException {
         resetCommentIdSequenceIfTableEmpty(connection);
         if (postVerification(connection, post_id)) {
             System.out.println("Пост с ID: " + post_id + " не найден");
@@ -578,7 +582,7 @@ public class SocialNetwork {
         String insertSQL = "INSERT INTO comments (text, creation_date, post_id, author_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             preparedStatement.setString(1, text);
-            preparedStatement.setDate(2, create_date);
+            preparedStatement.setDate(2, NOW);
             preparedStatement.setInt(3, post_id);
             preparedStatement.setInt(4, author_id);
             int rowsAffected = preparedStatement.executeUpdate();
@@ -662,7 +666,7 @@ public class SocialNetwork {
         System.out.println();
     }
 
-    private static void sendMessage(Connection connection, String text, java.sql.Date sent_date, int sender_id, int receiver_id) throws SQLException {
+    private static void sendMessage(Connection connection, String text, int sender_id, int receiver_id) throws SQLException {
         resetMessageIdSequenceIfTableEmpty(connection);
         if (userVerification(connection, sender_id) || userVerification(connection, receiver_id)) {
             System.out.println("Не существует пользователя с таким ID");
@@ -673,7 +677,7 @@ public class SocialNetwork {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertMessageSQL)) {
             preparedStatement.setInt(3, sender_id);
             preparedStatement.setInt(4, receiver_id);
-            preparedStatement.setDate(2, sent_date);
+            preparedStatement.setDate(2, NOW);
             preparedStatement.setString(1, text);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -982,6 +986,36 @@ public class SocialNetwork {
             }
         } catch (SQLException e) {
             System.out.println("Ошибка при обновлении поста: " + e.getMessage());
+            throw e;
+        }
+        System.out.println();
+    }
+
+    private static void updateComment(Connection connection, String text, int author_id, int comment_id) throws SQLException {
+        if (userVerification(connection, author_id)) {
+            System.out.println("Пользователя с ID: " + author_id + " не найден");
+            return;
+        }
+        if (commentVerification(connection, comment_id)) {
+            System.out.println("Комментарий с ID: " + comment_id + " не найден");
+            return;
+        }
+
+        String query = "UPDATE comments SET text = ? WHERE id = ? AND author_id = ?";
+
+        try(PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, text);
+            statement.setInt(2, comment_id);
+            statement.setInt(3, author_id);
+
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Комментарий успешно обновлен");
+            } else {
+                System.out.println("Комментарий не удалось обновить");
+            }
+        } catch (SQLException e) {
+            System.out.println("Ошибка при обновлении комментария: " + e.getMessage());
             throw e;
         }
         System.out.println();
